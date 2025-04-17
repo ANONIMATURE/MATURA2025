@@ -17,29 +17,19 @@ const generationConfig = {
 const genAI = new GenAI.GoogleGenerativeAI(SECRETS.GEMINI_API_KEY);
 
 async function run() {
-  // For text-only input, use the gemini-pro model
-  const model = genAI.getGenerativeModel({
-    model: "gemini-pro",
-    generationConfig,
-  });
-
-  // Write your prompt here
-  const prompt =
-    "Stwórz chwytliwe i krótkie zdanie promujące Discorda dla maturzystów. Skup się na zachęceniu do dołączenia, podkreślając dostęp do materiałów, przecieków arkuszy i wsparcia przed maturą. Dodaj link: https://discord.gg/NKtRwQDp. mogą też być # typu #Matura2025 #Matematyka #LGBT #Debata #Przecieki poniżej 280 znaków";
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  const text = response.text();
-  console.log(text);
-  sendTweet(text);
-}
-
-run();
-
-async function sendTweet(tweetText) {
   try {
-    await twitterClient.v2.tweet(tweetText);
-    console.log("Tweet sent successfully!");
+    const model = genAI.getGenerativeModel({
+      model: "gemini-pro",
+      generationConfig,
+    });
+
+    const prompt =
+      "Stwórz chwytliwe i krótkie zdanie promujące Discorda dla maturzystów. Skup się na zachęceniu do dołączenia, podkreślając dostęp do materiałów, przecieków arkuszy i wsparcia.";
+    const result = await model.generateContent(prompt);
+    const text = result?.response?.content || "Default Tweet Text"; // Fallback text
+    console.log(text);
+    sendTweet(text);
   } catch (error) {
-    console.error("Error sending tweet:", error);
+    console.error("Error generating content:", error);
   }
 }
